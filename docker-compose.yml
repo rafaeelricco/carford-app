@@ -1,0 +1,10 @@
+version: '4'
+services:
+  app:
+    container_name: carford-container
+    image: carford-image
+    build: .
+    env_file: .env
+    command: sh -c "flask db upgrade && gunicorn app:app -w 2 -b :8000"
+    ports:
+      - '8000:8000'
