@@ -1,6 +1,6 @@
-
-from app import app, db, User, Car, Person
+from wsgi import app, db, User, Car, Person
 from faker import Faker
+
 fake = Faker()
 
 
@@ -36,13 +36,16 @@ def test_delete_user():
         db.session.commit()
         assert User.query.filter_by(username=user_to_delete).first() is None
 
+
 # Car CRUD
-
-
 def test_add_car():
     with app.app_context():
-        car = Car(name=fake.user_name(), color='Amarelo',
-                  model='Sedan', owner_id=fake.random_int(min=1, max=100))
+        car = Car(
+            name=fake.user_name(),
+            color="Amarelo",
+            model="Sedan",
+            owner_id=fake.random_int(min=1, max=100),
+        )
         db.session.add(car)
         db.session.commit()
         assert car.id != 0
@@ -71,9 +74,8 @@ def test_delete_car():
         db.session.commit()
         assert Car.query.filter_by(name=car_name).first() is None
 
+
 # Person CRUD
-
-
 def test_add_person():
     with app.app_context():
         person = Person(name=fake.user_name())

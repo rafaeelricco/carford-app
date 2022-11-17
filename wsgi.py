@@ -10,9 +10,9 @@ from flask_wtf import FlaskForm
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY")
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 db = SQLAlchemy(app)
 
 bcrypt = Bcrypt(app)
@@ -20,26 +20,27 @@ migrate = Migrate(app, db)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = "login"
 
 
 # Tables
 class Person(db.Model):
-    __tablename__ = 'persons'
+    __tablename__ = "persons"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80), unique=False, nullable=False)
     oportunity = db.Column(db.Boolean, default=True)
 
 
 class Car(db.Model):
-    __tablename__ = 'cars'
+    __tablename__ = "cars"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(80), unique=False, nullable=False)
     color = db.Column(db.String(80), unique=False, nullable=False)
     model = db.Column(db.String(80), unique=False, nullable=False)
-    owner = db.relationship('Person', backref=db.backref('cars', lazy=True))
-    owner_id = db.Column(db.Integer, db.ForeignKey(
-        'persons.id'), nullable=False, autoincrement=True)
+    owner = db.relationship("Person", backref=db.backref("cars", lazy=True))
+    owner_id = db.Column(
+        db.Integer, db.ForeignKey("persons.id"), nullable=False, autoincrement=True
+    )
 
 
 # Login
@@ -55,42 +56,50 @@ class User(db.Model, UserMixin):
 
 
 class RegisterForm(FlaskForm):
-    username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    username = StringField(
+        validators=[InputRequired(), Length(min=4, max=20)],
+        render_kw={"placeholder": "Username"},
+    )
 
-    password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+    password = PasswordField(
+        validators=[InputRequired(), Length(min=8, max=20)],
+        render_kw={"placeholder": "Password"},
+    )
 
-    submit = SubmitField('Register')
+    submit = SubmitField("Register")
 
     def validate_username(self, username):
-        existing_user_username = User.query.filter_by(
-            username=username.data).first()
+        existing_user_username = User.query.filter_by(username=username.data).first()
         if existing_user_username:
             raise ValidationError(
-                'That username already exists. Please choose a different one.')
+                "That username already exists. Please choose a different one."
+            )
 
 
 class LoginForm(FlaskForm):
-    username = StringField(validators=[
-                           InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    username = StringField(
+        validators=[InputRequired(), Length(min=4, max=20)],
+        render_kw={"placeholder": "Username"},
+    )
 
-    password = PasswordField(validators=[
-                             InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
+    password = PasswordField(
+        validators=[InputRequired(), Length(min=8, max=20)],
+        render_kw={"placeholder": "Password"},
+    )
 
-    submit = SubmitField('Login')
+    submit = SubmitField("Login")
 
 
 # Routes
-@app.route('/')
+@app.route("/")
 @login_required
 def dashboard():
     get_persons = Person.query.all()
     get_cars = Car.query.all()
-    return render_template('dashboard.html', get_persons=get_persons, get_cars=get_cars)
+    return render_template("dashboard.html", get_persons=get_persons, get_cars=get_cars)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
@@ -98,18 +107,18 @@ def login():
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
-                return redirect(url_for('dashboard'))
-    return render_template('login.html', form=form)
+                return redirect(url_for("dashboard"))
+    return render_template("login.html", form=form)
 
 
-@app.route('/logout', methods=['GET', 'POST'])
+@app.route("/logout", methods=["GET", "POST"])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for("login"))
 
 
-@ app.route('/register', methods=['GET', 'POST'])
+@app.route("/register", methods=["GET", "POST"])
 def register():
     form = RegisterForm()
 
@@ -118,49 +127,47 @@ def register():
         new_user = User(username=form.username.data, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for('login'))
+        return redirect(url_for("login"))
 
-    return render_template('register.html', form=form)
+    return render_template("register.html", form=form)
+
 
 # CRUD Functions
-
-
-@app.route('/add_person', methods=['GET', 'POST'])
+@app.route("/add_person", methods=["GET", "POST"])
 @login_required
 def add_person():
-    if request.method == 'POST':
-        name = request.form['owner_name']
+    if request.method == "POST":
+        name = request.form["owner_name"]
         new_person = Person(name=name)
         db.session.add(new_person)
         db.session.commit()
-        return redirect(url_for('dashboard'))
+        return redirect(url_for("dashboard"))
 
 
-@app.route('/add_car', methods=['GET', 'POST'])
+@app.route("/add_car", methods=["GET", "POST"])
 @login_required
 def add_car():
-    if request.method == 'POST':
-        name = request.form['car_name']
-        color = request.form['car_color']
-        model = request.form['car_model']
-        owner_id = request.form['car_owner']
+    if request.method == "POST":
+        name = request.form["car_name"]
+        color = request.form["car_color"]
+        model = request.form["car_model"]
+        owner_id = request.form["car_owner"]
 
         quantity = Car.query.filter_by(owner_id=owner_id).count()
         if quantity == 3:
-            flash('This person already have 3 cars.')
-            return redirect(url_for('dashboard'))
+            flash("This person already have 3 cars.")
+            return redirect(url_for("dashboard"))
 
         update_oportunity = Person.query.filter_by(name=owner_id).first()
         update_oportunity.oportunity = False
         db.session.commit()
-        new_car = Car(name=name, color=color,
-                      model=model, owner_id=owner_id)
+        new_car = Car(name=name, color=color, model=model, owner_id=owner_id)
         db.session.add(new_car)
         db.session.commit()
-        return redirect(url_for('dashboard'))
+        return redirect(url_for("dashboard"))
 
 
-@app.route('/delete/<int:person_id>')
+@app.route("/delete/<int:person_id>")
 @login_required
 def delete_person(person_id):
     person = Person.query.filter_by(id=person_id).first()
@@ -173,44 +180,42 @@ def delete_person(person_id):
 
     db.session.delete(person)
     db.session.commit()
-    return redirect(url_for('dashboard'))
+    return redirect(url_for("dashboard"))
 
 
-@app.route('/delete_car/<int:car_id>')
+@app.route("/delete_car/<int:car_id>")
 @login_required
 def delete_car(car_id):
     car = Car.query.filter_by(id=car_id).first()
     db.session.delete(car)
     db.session.commit()
-    return redirect(url_for('dashboard'))
+    return redirect(url_for("dashboard"))
 
 
-@app.route('/update_owner/<int:person_id>', methods=['GET', 'POST'])
+@app.route("/update_owner/<int:person_id>", methods=["GET", "POST"])
 @login_required
 def update_person(person_id):
     person = Person.query.filter_by(id=person_id).first()
     car = Car.query.filter_by(owner_id=person.name).first()
-    if request.method == 'POST':
-        person.name = request.form['owner_name']
+    if request.method == "POST":
+        person.name = request.form["owner_name"]
         car.owner_id = person.name
         db.session.commit()
-        return redirect(url_for('dashboard'))
-    return render_template('update_owner.html', person=person, car=car)
+        return redirect(url_for("dashboard"))
+    return render_template("update_owner.html", person=person, car=car)
 
 
-@app.route('/update_car/<int:car_id>', methods=['GET', 'POST'])
+@app.route("/update_car/<int:car_id>", methods=["GET", "POST"])
 @login_required
 def update_car(car_id):
     car = Car.query.filter_by(id=car_id).first()
-    persons = Person.query.all()
-    if request.method == 'POST':
-        car.name = request.form['car_name']
-        car.color = request.form['car_color']
-        car.model = request.form['car_model']
-        car.owner_id = request.form['car_owner']
+    if request.method == "POST":
+        car.name = request.form["car_name"]
+        car.color = request.form["car_color"]
+        car.model = request.form["car_model"]
         db.session.commit()
-        return redirect(url_for('dashboard'))
-    return render_template('update_car.html', car=car, persons=persons)
+        return redirect(url_for("dashboard"))
+    return render_template("update_car.html", car=car)
 
 
 if __name__ == "__main__":

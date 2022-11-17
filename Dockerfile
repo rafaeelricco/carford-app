@@ -1,9 +1,12 @@
-FROM python:3-alpine
+FROM python:3
 
-RUN apk add build-base
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-ADD . /code
-WORKDIR /code
+COPY . /app
+WORKDIR /app
 
-RUN pip install gunicorn
-RUN pip install -r requirements.txt
+COPY requirements.txt .
+RUN pip --no-cache-dir install -r requirements.txt
+
+COPY . /app

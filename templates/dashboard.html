@@ -1,229 +1,183 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'layout.html' %}
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      display: grid;
-      justify-items: center;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-        Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
-        sans-serif;
-    }
+{% block title %} Dashboard {% endblock %}
 
-    p {
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .form {
-      display: grid;
-      grid-gap: 10px;
-      margin: 0.618rem 0 0.618rem 0;
-    }
-
-    ::placeholder {
-      font-size: 0.818rem;
-    }
-
-    .button-table {
-      display: grid;
-      grid-gap: 10px;
-      grid-auto-flow: column;
-      justify-content: start;
-    }
-
-    .table-list {
-      margin: 2rem 0 2rem 0;
-    }
-  </style>
-  <title>Carford | Overview</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous" />
-</head>
+{% block content %}
 
 <body>
-  <div class="container-xl">
-    <nav style="margin: 1rem 0 0 0" class="navbar">
-      {% if current_user.is_authenticated %}
-      <div class="container">
-        <p style="margin: 0;">Loja Carford</p>
-        <div class="dropdown">
-          <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
-            aria-expanded="false">
-            {{ current_user.username }}
-          </button>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout
-              </a></li>
-          </ul>
-        </div>
+  <nav style="margin: 1rem 0 0 0" class="navbar">
+    {% if current_user.is_authenticated %}
+    <div class="container">
+      <p style="margin: 0;">Loja Carford</p>
+      <div class="dropdown">
+        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+          aria-expanded="false">
+          {{ current_user.username }}
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout
+            </a></li>
+        </ul>
       </div>
-      {% endif %}
-    </nav>
-    <form class="ui form" action="add_person" method="post">
-      <div class="form">
-        <div class="field">
-          <input class="form-control form-control-sm" name="owner_name" type="text"
-            placeholder="Owner name. Ex: John Doe" aria-label="default input example" required />
-        </div>
-        <button type="submit" class="btn btn-success" style="
+    </div>
+    {% endif %}
+  </nav>
+  <form class="ui form" action="add_person" method="post">
+    <div class="form">
+      <div class="field">
+        <input class="form-control form-control-sm" name="owner_name" type="text" placeholder="Owner name. Ex: John Doe"
+          aria-label="default input example" required />
+      </div>
+      <button type="submit" class="btn btn-success" style="
               --bs-btn-padding-y: 0.16rem;
               --bs-btn-padding-x: 1.618rem;
               --bs-btn-font-size: 0.75rem;
             ">
-          Add
-        </button>
-      </div>
-    </form>
-    <form action="add_car" method="post">
-      <div class="field">
-        <div class="form">
-          <input class="form-control form-control-sm" name="car_name" type="text"
-            placeholder="Car name. Ex: Chevrolet Onix Plus" aria-label="default input example" required />
-          <select name="car_color" class="form-select form-select-sm">
-            <option value="" disabled selected hidden>Chose car color</option>
-            <option name="car_color" value="Amarelo">Amarelo</option>
-            <option name="car_color" value="Cinza">Cinza</option>
-            <option name="car_color" value="Azul">Azul</option>
-          </select>
+        Add
+      </button>
+    </div>
+  </form>
+  <form action="add_car" method="post">
+    <div class="field">
+      <div class="form">
+        <input class="form-control form-control-sm" name="car_name" type="text"
+          placeholder="Car name. Ex: Chevrolet Onix Plus" aria-label="default input example" required />
+        <select name="car_color" class="form-select form-select-sm">
+          <option value="" disabled selected hidden>Chose car color</option>
+          <option name="car_color" value="Amarelo">Amarelo</option>
+          <option name="car_color" value="Cinza">Cinza</option>
+          <option name="car_color" value="Azul">Azul</option>
+        </select>
 
-          <select name="car_model" class="form-select form-select-sm" aria-label="Default select example">
-            <option value="" disabled selected hidden>Chose car model</option>
-            <option name="car_model" value="Escotilha">Escotilha</option>
-            <option name="car_model" value="Sedan">Sedan</option>
-            <option name="car_model" value="Conversível">Conversível</option>
-          </select>
+        <select name="car_model" class="form-select form-select-sm" aria-label="Default select example">
+          <option value="" disabled selected hidden>Chose car model</option>
+          <option name="car_model" value="Escotilha">Escotilha</option>
+          <option name="car_model" value="Sedan">Sedan</option>
+          <option name="car_model" value="Conversível">Conversível</option>
+        </select>
 
-          <select name="car_owner" class="form-select form-select-sm" aria-label="Default select example">
-            <option name="car_owner" value="" disabled selected hidden>
-              Who's the owner?
-            </option>
-            {% for person in get_persons %}
-            <option name="car_owner" value="{{person.name}}">
-              {{person.name}}
-            </option>
-            {% endfor %}
-          </select>
-          {% with messages = get_flashed_messages() %} {% if messages %} {%
-          for message in messages %}
-          <div class="alert alert-warning" role="alert">{{ message }}</div>
-          {% endfor %} {% endif %} {% endwith %} {% block body %}{% endblock
-          %}
-          <button type="submit" class="btn btn-success" style="
+        <select name="car_owner" class="form-select form-select-sm" aria-label="Default select example">
+          <option name="car_owner" value="" disabled selected hidden>
+            Who's the owner?
+          </option>
+          {% for person in get_persons %}
+          <option name="car_owner" value="{{person.name}}">
+            {{person.name}}
+          </option>
+          {% endfor %}
+        </select>
+        {% with messages = get_flashed_messages() %} {% if messages %} {%
+        for message in messages %}
+        <div class="alert alert-warning" role="alert">{{ message }}</div>
+        {% endfor %} {% endif %} {% endwith %} {% block body %}{% endblock
+        %}
+        <button type="submit" class="btn btn-success" style="
                 --bs-btn-padding-y: 0.16rem;
                 --bs-btn-padding-x: 1.618rem;
                 --bs-btn-font-size: 0.75rem;
               ">
-            Add
-          </button>
-        </div>
+          Add
+        </button>
       </div>
-    </form>
+    </div>
+  </form>
 
-    <table class="table table-hover table-list">
-      <thead>
-        <tr>
-          <th scope="col">Owner name</th>
-          <th scope="col">Cars</th>
-          <th scope="col">Have a car?</th>
-          <th scope="col">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for person in get_persons %}
-        <tr>
-          <td>{{person.name}}</td>
-          <td rowspan="3">
-            {% for car in get_cars %}
-            {% if car.owner_id == person.name %}
-            {{car.name}} <br />
-            {% endif %}
-            {% endfor %}
-          </td>
-          <td>
-            {% if person.oportunity == 1 %}
-            <span class="badge text-bg-success">sales opportunity</span>
-            {% else %}
-            <span class="badge text-bg-danger">already have a car</span>
-            {% endif %}
-          </td>
-          <td>
-            <div class="button-table">
-              <a href="/delete/{{ person.id }}">
-                <button type="button" class="btn btn-danger" style="
+  <table class="table table-hover table-list">
+    <thead>
+      <tr>
+        <th scope="col">Owner name</th>
+        <th scope="col">Cars</th>
+        <th scope="col">Have a car?</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for person in get_persons %}
+      <tr>
+        <td>{{person.name}}</td>
+        <td rowspan="3">
+          {% for car in get_cars %}
+          {% if car.owner_id == person.name %}
+          {{car.name}} <br />
+          {% endif %}
+          {% endfor %}
+        </td>
+        <td>
+          {% if person.oportunity == 1 %}
+          <span class="badge text-bg-success">sales opportunity</span>
+          {% else %}
+          <span class="badge text-bg-danger">already have a car</span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="button-table">
+            <a href="/delete/{{ person.id }}">
+              <button type="button" class="btn btn-danger" style="
                 --bs-btn-padding-y: 0.25rem;
                 --bs-btn-padding-x: 0.5rem;
                 --bs-btn-font-size: 0.75rem;
               ">
-                  Delete
-                </button>
-              </a>
-              <a href="/update_owner/{{ person.id }}">
-                <button type="button" class="btn btn-primary" style="
+                Delete
+              </button>
+            </a>
+            <a href="/update_owner/{{ person.id }}">
+              <button type="button" class="btn btn-primary" style="
                 --bs-btn-padding-y: 0.25rem;
                 --bs-btn-padding-x: 0.5rem;
                 --bs-btn-font-size: 0.75rem;
               ">
-                  Update
-                </button>
-              </a>
-            </div>
-          </td>
-        </tr>
-      </tbody>
+                Update
+              </button>
+            </a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+    {% endfor %}
+  </table class="table-list">
+  <table class="table table-hover table-list">
+    <thead>
+      <tr>
+        <th scope="col">Car name</th>
+        <th scope="col">Owner</th>
+        <th scope="col">Color</th>
+        <th scope="col">Model</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for car in get_cars %}
+      <tr>
+        <td>{{car.name}}</td>
+        <td>{{car.owner_id}}</td>
+        <td>{{car.color}}</td>
+        <td>{{car.model}}</td>
+        <td>
+          <div class="button-table">
+            <a href="/delete_car/{{car.id}}">
+              <button type="button" class="btn btn-danger" style="
+                      --bs-btn-padding-y: 0.25rem;
+                      --bs-btn-padding-x: 0.5rem;
+                      --bs-btn-font-size: 0.75rem;
+                    ">
+                Delete
+              </button>
+            </a>
+            <a href="/update_car/{{car.id}}">
+              <button type="button" class="btn btn-primary" style="
+                      --bs-btn-padding-y: 0.25rem;
+                      --bs-btn-padding-x: 0.5rem;
+                      --bs-btn-font-size: 0.75rem;
+                    ">
+                Update
+              </button>
+            </a>
+          </div>
+        </td>
+      </tr>
       {% endfor %}
-    </table class="table-list">
-    <table class="table table-hover table-list">
-      <thead>
-        <tr>
-          <th scope="col">Car name</th>
-          <th scope="col">Owner</th>
-          <th scope="col">Color</th>
-          <th scope="col">Model</th>
-          <th scope="col">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for car in get_cars %}
-        <tr>
-          <td>{{car.name}}</td>
-          <td>{{car.owner_id}}</td>
-          <td>{{car.color}}</td>
-          <td>{{car.model}}</td>
-          <td>
-            <div class="button-table">
-              <a href="/delete_car/{{car.id}}">
-                <button type="button" class="btn btn-danger" style="
-                      --bs-btn-padding-y: 0.25rem;
-                      --bs-btn-padding-x: 0.5rem;
-                      --bs-btn-font-size: 0.75rem;
-                    ">
-                  Delete
-                </button>
-              </a>
-              <a href="/update_car/{{car.id}}">
-                <button type="button" class="btn btn-primary" style="
-                      --bs-btn-padding-y: 0.25rem;
-                      --bs-btn-padding-x: 0.5rem;
-                      --bs-btn-font-size: 0.75rem;
-                    ">
-                  Update
-                </button>
-              </a>
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
-    crossorigin="anonymous"></script>
+    </tbody>
+  </table>
 </body>
 
-</html>
+{% endblock %}
